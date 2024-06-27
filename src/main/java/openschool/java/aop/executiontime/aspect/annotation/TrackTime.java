@@ -1,4 +1,4 @@
-package openschool.java.aop.annotation;
+package openschool.java.aop.executiontime.aspect.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,1 +1,11 @@
-spring.application.name=aop
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/aop
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8080

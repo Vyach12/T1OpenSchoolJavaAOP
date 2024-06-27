@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  open-school-java-aop-postgres:
+    image: postgres:16
+    container_name: open_school_java_aop_postgres
+    environment:
+      POSTGRES_DB: "aop"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+    ports:
+      - "5432:5432"
