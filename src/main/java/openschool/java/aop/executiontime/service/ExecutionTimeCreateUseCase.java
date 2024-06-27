@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ExecutionTimeService {
+public class ExecutionTimeCreateUseCase {
     private final ExecutionTimeRepository repository;
 
     @Async

@@ -21,6 +21,7 @@ public class ExecutionTimeEntity {
     @Id
     @UuidGenerator
     private UUID id;
+    private String className;
     private String methodName;
     private long duration;
 }

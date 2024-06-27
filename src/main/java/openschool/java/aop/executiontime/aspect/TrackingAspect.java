@@ -3,7 +3,7 @@ package openschool.java.aop.executiontime.aspect;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import openschool.java.aop.executiontime.domain.ExecutionTimeEntity;
-import openschool.java.aop.executiontime.service.ExecutionTimeService;
+import openschool.java.aop.executiontime.service.ExecutionTimeCreateUseCase;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TrackingAspect {
 
-    private final ExecutionTimeService executionTimeService;
+    private final ExecutionTimeCreateUseCase executionTimeCreateUseCase;
 
     @Around("@annotation(openschool.java.aop.executiontime.aspect.annotation.TrackTime)")
     public Object trackTime(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -24,8 +24,9 @@ public class TrackingAspect {
         long duration = System.currentTimeMillis() - startTime;
 
         log.info("Time elapsed: {} ms", duration);
-        executionTimeService.save(ExecutionTimeEntity.builder()
-                .methodName(joinPoint.getSignature().toLongString())
+        executionTimeCreateUseCase.save(ExecutionTimeEntity.builder()
+                .className(joinPoint.getSignature().getDeclaringTypeName())
+                .methodName(joinPoint.getSignature().getName())
                 .duration(duration)
                 .build()
         );
