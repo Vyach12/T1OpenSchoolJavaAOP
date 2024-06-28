@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import openschool.java.aop.executiontime.domain.ExecutionTimeEntity;
+import openschool.java.aop.executiontime.dto.MethodInfoTO;
 import openschool.java.aop.executiontime.service.ExecutionTimeFindUseCase;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,24 +24,19 @@ public class TrackingController {
 
     @GetMapping("/all")
     @Operation(summary = "Возвращает все измерения времени")
-    public List<ExecutionTimeEntity> getAll() {
+    public List<ExecutionTimeEntity> getAllMeasurements() {
         return findUseCase.getAll();
     }
 
-    @GetMapping("/average")
-    @Operation(summary = "Возвращает среднее время выполнения методов")
-    public Map<String, Double> getAverageTime() {
-        return findUseCase.getAverageTime();
+    @GetMapping
+    @Operation(summary = "Возвращает всю информацию о методах всех классов")
+    public Map<String, Map<String, MethodInfoTO>> getAllClassInfo() {
+        return findUseCase.getClassInfo();
     }
 
-    @GetMapping("/total")
-    @Operation(summary = "Возвращает среднее время выполнения методов")
-    public Map<String, Long> getTotalTime() {
-        return findUseCase.getTotalTime();
-    }
-
-    @GetMapping("/grouping")
-    public Map<String, Map<String, Double>> getExecutionTimesStatisticsByClass() {
-        return findUseCase.getExecutionTimesStatisticsByClass();
+    @GetMapping("/{className}")
+    @Operation(summary = "Возвращает информацию о классе с именем {className}")
+    public Map<String, Map<String, MethodInfoTO>> getClassInfo(@PathVariable String className) {
+        return findUseCase.getClassInfo(className);
     }
 }
