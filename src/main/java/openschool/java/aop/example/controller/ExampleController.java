@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/example")
+@RequestMapping("/api/v1/example")
 @RequiredArgsConstructor
 @Tag(name = "ExampleController", description = "Тестовый контроллер для вызова методов, помеченных аннотациями TrackTime и TrackAsyncTime")
 public class ExampleController {

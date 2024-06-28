@@ -24,7 +24,7 @@ public class TrackingAsyncAspect {
         executionTimeCreateUseCase.save(ExecutionTimeEntity.builder()
                 .className(joinPoint.getSignature().getDeclaringTypeName())
                 .methodName(joinPoint.getSignature().getName())
-                .duration(duration)
+                .durationMs(duration)
                 .build()
         );
 

@@ -23,5 +23,5 @@ public class ExecutionTimeEntity {
     private UUID id;
     private String className;
     private String methodName;
-    private long duration;
+    private long durationMs;
 }

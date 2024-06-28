@@ -2,13 +2,17 @@ package openschool.java.aop.executiontime.service;
 
 import lombok.RequiredArgsConstructor;
 import openschool.java.aop.executiontime.domain.ExecutionTimeEntity;
-import openschool.java.aop.executiontime.dto.MethodInfoTO;
+import openschool.java.aop.executiontime.dto.ClassStatisticsTO;
+import openschool.java.aop.executiontime.dto.ExecutionTimeStatisticsTO;
+import openschool.java.aop.executiontime.dto.MethodStatisticsTO;
 import openschool.java.aop.executiontime.repository.ExecutionTimeRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,46 +24,56 @@ public class ExecutionTimeFindUseCase {
         return repository.findAll();
     }
 
-    public Map<String, Map<String, MethodInfoTO>> getClassInfo() {
-        return map(repository.findAll());
+    public Set<ClassStatisticsTO> getClassInfo() {
+        return transformToClassStatisticsTO(repository.findAll());
     }
 
-    public Map<String, Map<String, MethodInfoTO>> getClassInfo(String className) {
-        return map(repository.findAllByClassName(className));
+    public Set<ClassStatisticsTO> getClassInfo(String className) {
+        return transformToClassStatisticsTO(repository.findAllByClassName(className));
     }
 
-    public Map<String, Map<String, MethodInfoTO>> map(List<ExecutionTimeEntity> executionTimes) {
-        Map<String, Map<String, MethodInfoTO>> result = new HashMap<>();
-        for (var executionTime : executionTimes) {
-            Map<String, MethodInfoTO> methodInfoTOMap;
-            int numberOfCalls = 1;
-            long totalTime = executionTime.getDuration();
-            double averageTime = totalTime;
+    private Map<String, Map<String, List<ExecutionTimeEntity>>> groupByClassAndMethodNames(List<ExecutionTimeEntity> executionTimes) {
+        return executionTimes.stream()
+                .collect(Collectors.groupingBy(
+                        ExecutionTimeEntity::getClassName,
+                        Collectors.groupingBy(ExecutionTimeEntity::getMethodName)
+                ));
+    }
 
-            if (result.containsKey(executionTime.getClassName())) {
-                methodInfoTOMap = result.get(executionTime.getClassName());
+    private Set<MethodStatisticsTO> collectByMethod(Map<String, List<ExecutionTimeEntity>> methods) {
+        Set<MethodStatisticsTO> methodStatistics = new HashSet<>();
 
-                if (methodInfoTOMap.containsKey(executionTime.getMethodName())) {
-                    MethodInfoTO infoTO = methodInfoTOMap.get(executionTime.getMethodName());
+        for (var methodEntry : methods.entrySet()) {
+            String methodName = methodEntry.getKey();
+            List<ExecutionTimeEntity> methodEntities = methodEntry.getValue();
 
-                    numberOfCalls += infoTO.getNumberOfCalls();
-                    totalTime += infoTO.getTotalTime();
-                    averageTime = (double) totalTime / numberOfCalls;
-                }
-            } else {
-                methodInfoTOMap = new HashMap<>();
-                result.put(executionTime.getClassName(), methodInfoTOMap);
+            long totalDuration = 0;
+            for (ExecutionTimeEntity entity : methodEntities) {
+                totalDuration += entity.getDurationMs();
             }
+            int numberOfCalls = methodEntities.size();
+            double averageDuration = (double) totalDuration / numberOfCalls;
 
-            MethodInfoTO to = MethodInfoTO.builder()
-                    .numberOfCalls(numberOfCalls)
-                    .averageTime(averageTime)
-                    .totalTime(totalTime)
-                    .build();
+            methodStatistics.add(new MethodStatisticsTO(
+                    methodName,
+                    new ExecutionTimeStatisticsTO(numberOfCalls, totalDuration, averageDuration)
+            ));
+        }
+        return methodStatistics;
+    }
 
-            methodInfoTOMap.put(executionTime.getMethodName(), to);
+    private Set<ClassStatisticsTO> transformToClassStatisticsTO(List<ExecutionTimeEntity> executionTimes) {
+        var groupedByClassAndMethod = groupByClassAndMethodNames(executionTimes);
+
+        Set<ClassStatisticsTO> classStatistics = new HashSet<>();
+
+        for (var classEntry : groupedByClassAndMethod.entrySet()) {
+            String className = classEntry.getKey();
+            Set<MethodStatisticsTO> methodStats = collectByMethod(classEntry.getValue());
+
+            classStatistics.add(new ClassStatisticsTO(className, methodStats));
         }
 
-        return result;
+        return classStatistics;
     }
 }

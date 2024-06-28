@@ -16,10 +16,6 @@ public class ExampleService {
         Thread.sleep(1000);
     }
 
-    public void tempSpendTime() {
-        ((ExampleService) AopContext.currentProxy()).spendTime();
-    }
-
     @TrackAsyncTime
     @Async
     @SneakyThrows
