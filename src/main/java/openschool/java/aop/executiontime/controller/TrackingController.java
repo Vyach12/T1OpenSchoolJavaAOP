@@ -25,11 +25,11 @@ public class TrackingController {
     @GetMapping("/all")
     @Operation(summary = "Возвращает все измерения времени")
     public List<ExecutionTimeEntity> getAllMeasurements() {
-        return findUseCase.getAll();
+        return findUseCase.getAllMeasurements();
     }
 
     @GetMapping
-    @Operation(summary = "Возвращает всю информацию о методах всех классов")
+    @Operation(summary = "Возвращает всю информацию о методах для всех классов")
     public Map<String, Map<String, MethodInfoTO>> getAllClassInfo() {
         return findUseCase.getClassInfo();
     }
