@@ -13,16 +13,6 @@ import java.lang.annotation.Target;
  * Аннотация применяется только к методам, а собранные данные будут включать имя класса,
  * имя метода и продолжительность выполнения метода.
  *
- * <p>Пример использования:</p>
- * <pre>
- * {@code
- * @TrackTime
- * public void exampleMethod() {
- *     // Реализация метода
- * }
- * }
- * </pre>
- *
  * @see TrackAsyncTime
  * @see TrackingAspect
  */
